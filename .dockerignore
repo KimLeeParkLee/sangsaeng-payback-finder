@@ -1,0 +1,38 @@
+# Global Docker ignore for root build context (frontend image)
+
+# VCS / CI / OS noise
+.git
+.github
+.gitignore
+.gitattributes
+.DS_Store
+
+# Editor/IDE
+.idea
+.vscode
+*.iml
+
+# Node-related (frontend project)
+my-app/node_modules
+my-app/coverage
+my-app/.vite
+
+# Build artifacts
+my-app/dist
+
+# Logs
+*.log
+npm-debug.log*
+
+# Env/secrets at repo root
+.env
+*.env
+*.pem
+*.key
+*.crt
+*.p12
+*.jks
+
+# Keep nginx/ for Dockerfile.frontend COPY
+# Keep my-app/package-lock.json for reproducible npm ci
+
