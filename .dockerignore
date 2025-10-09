@@ -1,0 +1,41 @@
+# Reduce Docker build context size and avoid leaking secrets
+
+# VCS / CI / IDE
+.git
+.github
+.gitattributes
+.gitignore
+.idea
+.vscode
+*.iml
+.DS_Store
+
+# Gradle / build outputs
+.gradle
+build
+out
+target
+
+# Logs / temp / caches
+*.log
+*.tmp
+*.swp
+tmp
+.cache
+
+# Tests (not needed for bootJar -x test)
+src/test/
+
+# Node / frontend artifacts (if present)
+node_modules/
+dist/
+
+# Env / secrets
+.env
+*.env
+*.pem
+*.key
+*.crt
+*.p12
+*.jks
+
