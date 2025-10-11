@@ -24,7 +24,7 @@ services:
 
   backend:
     # GitHub Actions에서 빌드하고 푸시한 이미지 이름
-    image: ghcr.io/kn9012/paybackfinder-backend:latest
+    image: ghcr.io/kimleeparklee/paybackfinder-backend:latest
     container_name: my_backend_app
     restart: always
     depends_on: # db 컨테이너가 먼저 실행되도록 보장
