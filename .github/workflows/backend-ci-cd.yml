@@ -67,7 +67,7 @@ jobs:
           key: ${{ secrets.GCP_SSH_KEY }}
           script: |
             set -e
-            cd ~/paybackfinder
+            cd /home/User/paybackfinder
             
             echo "[+] Pulling latest source code from Git..."
             git pull origin backend
