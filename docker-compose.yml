@@ -32,9 +32,8 @@ services:
     ports:
       - "8080:8080"
     environment:
-      # ⭐️ 이 부분이 핵심! 'prod' 프로필을 활성화합니다.
       - SPRING_PROFILES_ACTIVE=prod
 
-    # ⭐️ 서버에 생성된 .env 파일을 읽어 환경변수로 주입합니다.
+    # 서버에 생성된 .env 파일을 읽어 환경변수로 주입합니다.
     env_file:
       - ./.env
