@@ -21,3 +21,20 @@ services:
       # 데이터를 영구적으로 저장하기 위한 볼륨 설정 (매우 중요!)
       # [볼륨 또는 호스트 경로]:[컨테이너 내부 경로]
       - ./data:/var/lib/postgresql/data
+
+  backend:
+    # GitHub Actions에서 빌드하고 푸시한 이미지 이름
+    image: ghcr.io/kn9012/paybackfinder-backend:latest
+    container_name: my_backend_app
+    restart: always
+    depends_on: # db 컨테이너가 먼저 실행되도록 보장
+      - db
+    ports:
+      - "8080:8080"
+    environment:
+      # ⭐️ 이 부분이 핵심! 'prod' 프로필을 활성화합니다.
+      - SPRING_PROFILES_ACTIVE=prod
+
+    # ⭐️ 서버에 생성된 .env 파일을 읽어 환경변수로 주입합니다.
+    env_file:
+      - ./.env
