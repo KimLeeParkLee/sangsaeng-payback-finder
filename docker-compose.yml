@@ -1,0 +1,23 @@
+version: "3.8" # 파일 규격 버전
+
+services:
+  db:
+    image: postgres:15 # 사용할 PostgreSQL 이미지 (버전 15)
+    container_name: my_postgres_db # 실행될 컨테이너의 이름
+    restart: always # 컨테이너가 중지되면 항상 자동으로 다시 시작
+
+    environment:
+      # 데이터베이스 슈퍼유저(postgres)의 비밀번호 설정 (필수!)
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      # 원하는 데이터베이스 이름을 지정할 수 있습니다 (선택 사항)
+      - POSTGRES_DB=${DB_NAME}
+
+    ports:
+      # 호스트 PC의 5432 포트와 컨테이너의 5432 포트를 연결
+      # 형식: [호스트 포트]:[컨테이너 포트]
+      - "5432:5432"
+
+    volumes:
+      # 데이터를 영구적으로 저장하기 위한 볼륨 설정 (매우 중요!)
+      # [볼륨 또는 호스트 경로]:[컨테이너 내부 경로]
+      - ./data:/var/lib/postgresql/data
