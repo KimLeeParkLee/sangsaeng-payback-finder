@@ -69,6 +69,9 @@ jobs:
             set -e
             cd ~/paybackfinder
             
+            echo "[+] Pulling latest source code from Git..."
+            git pull origin backend
+            
             echo "[+] Creating .env file on the server..."
             sudo bash -c '
               echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" > .env
