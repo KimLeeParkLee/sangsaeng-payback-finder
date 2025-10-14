@@ -45,6 +45,7 @@ jobs:
           push: true
           build-args: |
             VITE_API_URL=/api
+            VITE_KAKAO_MAP_APP_KEY=${{ secrets.KAKAO_MAP_APP_KEY }}
           tags: |
             ${{ steps.prep.outputs.image }}:latest
             ${{ steps.prep.outputs.image }}:${{ env.TAG }}
