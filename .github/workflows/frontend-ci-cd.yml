@@ -64,6 +64,11 @@ jobs:
           key: ${{ secrets.GCP_SSH_KEY }}
           script: |
             set -e
+            # Ensure compose variable substitution works
+            GHCR_OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+            IMAGE_TAG="${{ env.TAG }}"
+            export GHCR_OWNER IMAGE_TAG
+
             cd ~/paybackfinder
             echo "[+] Logging in to GHCR..."
             echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
