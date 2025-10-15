@@ -49,6 +49,10 @@ export default function HomePage() {
 
   const doSearch = async (origin?: LatLng, r?: number) => {
     const c = origin ?? center;
+    if (!c) {
+      setError('위치 정보가 아직 준비되지 않았습니다');
+      return;
+    }
     const rad = r ?? computedRadius;
     setLoading(true);
     setError(null);
@@ -128,7 +132,7 @@ export default function HomePage() {
           <div className="rounded-md border bg-white px-2 py-1 text-gray-700">
             반경 약 {computedRadius.toLocaleString()} m (zoom {level})
           </div>
-          <Button size="sm" onClick={() => doSearch()} disabled={loading}>
+          <Button size="sm" onClick={() => doSearch()} disabled={loading || !center}>
             {loading ? '검색 중...' : '검색'}
           </Button>
         </div>
