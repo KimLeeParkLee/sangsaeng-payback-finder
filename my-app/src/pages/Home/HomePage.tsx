@@ -8,10 +8,10 @@ import type { LatLng } from '@/types/map';
 import { getBrowserLocation } from '@/lib/geolocation';
 import { fetchNearbyStores } from '@/api/stores';
 
-const DEFAULT_CENTER: LatLng = { lat: 37.5665, lng: 126.978 }; // 서울 시청 근처
+const DEFAULT_CENTER: LatLng = { lat: 37.5665, lng: 126.978 }; // 서울 시청 근처 (지오로케이션 실패 시 사용)
 
 export default function HomePage() {
-  const [center, setCenter] = useState<LatLng>(DEFAULT_CENTER);
+  const [center, setCenter] = useState<LatLng | null>(null);
   const [q, setQ] = useState('');
   const [sortBy, setSortBy] = useState<'distance' | 'confidence'>('distance');
   const [nearby, setNearby] = useState<Store[]>([]);
@@ -32,9 +32,19 @@ export default function HomePage() {
   }));
 
   useEffect(() => {
+    let done = false;
     getBrowserLocation()
-      .then((pos) => setCenter({ lat: pos.coords.latitude, lng: pos.coords.longitude }))
-      .catch(() => {});
+      .then((pos) => {
+        if (done) return;
+        setCenter({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+      })
+      .catch(() => {
+        // 권한 거부/실패 시 기본 중심으로 설정
+        setCenter(DEFAULT_CENTER);
+      });
+    return () => {
+      done = true;
+    };
   }, []);
 
   const doSearch = async (origin?: LatLng, r?: number) => {
@@ -54,9 +64,11 @@ export default function HomePage() {
 
   // 위치가 바뀌면 자동 검색(초기 한번)
   useEffect(() => {
-    doSearch(center, computedRadius);
+    if (center) {
+      doSearch(center, computedRadius);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [center.lat, center.lng, computedRadius, sortBy]);
+  }, [center, computedRadius, sortBy]);
 
   // 거리 계산(Haversine)
   const dist = (a: LatLng, b: LatLng) => {
@@ -75,7 +87,7 @@ export default function HomePage() {
   const handleMapIdle = useCallback(
     (c: LatLng, lvl?: number, bounds?: { sw: LatLng; ne: LatLng }) => {
       // 디바운스하여 과도한 요청 방지 + 변경 없으면 무시
-      const changed =
+      const changed = !center ||
         Math.abs(c.lat - center.lat) > 1e-6 || Math.abs(c.lng - center.lng) > 1e-6;
       // 반경 계산: 보이는 영역의 대각선 절반(=반경) 사용
       if (bounds) {
@@ -98,7 +110,7 @@ export default function HomePage() {
         if (typeof lvl === 'number') setLevel(lvl);
       }, 350);
     },
-    [center.lat, center.lng]
+    [center]
   );
 
   return (
@@ -120,12 +132,18 @@ export default function HomePage() {
             {loading ? '검색 중...' : '검색'}
           </Button>
         </div>
-        <KakaoMap
-          center={center}
-          markers={markers}
-          onIdle={(c, lvl, b) => handleMapIdle(c, lvl, b)}
-          className="h-[60vh] w-full rounded-xl border"
-        />
+        {center ? (
+          <KakaoMap
+            center={center}
+            markers={markers}
+            onIdle={(c, lvl, b) => handleMapIdle(c, lvl, b)}
+            className="h-[60vh] w-full rounded-xl border"
+          />
+        ) : (
+          <div className="flex h-[60vh] w-full items-center justify-center rounded-xl border text-sm text-muted-foreground">
+            위치 정보를 불러오는 중...
+          </div>
+        )}
         {error && (
           <div className="mt-2 rounded-md border border-red-200 bg-red-50 p-2 text-sm text-red-700">
             {error}
