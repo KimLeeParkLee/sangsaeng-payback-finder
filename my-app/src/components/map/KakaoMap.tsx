@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { loadKakaoMaps } from '@/lib/kakao';
-import type { LatLng, MapMarker } from '@/types/map';
+import type { LatLng, MapMarker, MapBounds } from '@/types/map';
 
 type Props = {
   center: LatLng;
@@ -8,12 +8,14 @@ type Props = {
   markers?: MapMarker[];
   onMarkerClick?: (id: string) => void;
   className?: string;
+  onIdle?: (center: LatLng, level?: number, bounds?: MapBounds) => void;
 };
 
-export function KakaoMap({ center, zoom = 5, markers = [], onMarkerClick, className }: Props) {
+export function KakaoMap({ center, zoom, markers = [], onMarkerClick, className, onIdle }: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
+  const idleListenerRef = useRef<any>(null);
 
   // init map
   useEffect(() => {
@@ -26,8 +28,31 @@ export function KakaoMap({ center, zoom = 5, markers = [], onMarkerClick, classN
         const { maps } = kakao;
         mapRef.current = new maps.Map(containerRef.current, {
           center: new maps.LatLng(center.lat, center.lng),
-          level: zoom, // level: 1(가까이) ~ 14(멀리)
+          level: typeof zoom === 'number' ? zoom : 5, // 초기 레벨만 설정
         });
+
+        // Attach idle listener to propagate center/level/bounds upward
+        if (onIdle) {
+          const handler = () => {
+            try {
+              const c = mapRef.current.getCenter();
+              const level = mapRef.current.getLevel();
+              const b = mapRef.current.getBounds();
+              const sw = b.getSouthWest();
+              const ne = b.getNorthEast();
+              onIdle(
+                { lat: c.getLat(), lng: c.getLng() },
+                level,
+                { sw: { lat: sw.getLat(), lng: sw.getLng() }, ne: { lat: ne.getLat(), lng: ne.getLng() } }
+              );
+            } catch (e) {
+              // eslint-disable-next-line no-console
+              console.warn('[KakaoMap] idle callback error', e);
+            }
+          };
+          maps.event.addListener(mapRef.current, 'idle', handler);
+          idleListenerRef.current = handler;
+        }
       } catch (e) {
         // eslint-disable-next-line no-console
         console.error('[KakaoMap] init error:', e);
@@ -35,16 +60,23 @@ export function KakaoMap({ center, zoom = 5, markers = [], onMarkerClick, classN
     })();
     return () => {
       mounted = false;
+      const kakao = (window as any).kakao;
+      if (idleListenerRef.current && kakao?.maps?.event && mapRef.current) {
+        kakao.maps.event.removeListener(mapRef.current, 'idle', idleListenerRef.current);
+        idleListenerRef.current = null;
+      }
     };
   }, []);
 
-  // center/zoom updates
+  // center/zoom updates (zoom은 명시된 경우에만 강제 적용)
   useEffect(() => {
     const map = mapRef.current;
     const kakao = (window as any).kakao;
     if (!map || !kakao?.maps) return;
     map.setCenter(new kakao.maps.LatLng(center.lat, center.lng));
-    map.setLevel(zoom);
+    if (typeof zoom === 'number') {
+      map.setLevel(zoom);
+    }
   }, [center.lat, center.lng, zoom]);
 
   // markers updates
@@ -86,4 +118,3 @@ export function KakaoMap({ center, zoom = 5, markers = [], onMarkerClick, classN
 }
 
 export default KakaoMap;
-

@@ -12,7 +12,7 @@ export function StoreList({ stores, onSelect, onJudge }: Props) {
     <div className="space-y-2">
       {stores.map((s) => (
         <div
-          key={s.id}
+          key={s.id || `${s.name}-${s.lat}-${s.lng}`}
           className="flex items-center justify-between rounded-lg border p-3"
         >
           <div>
@@ -31,7 +31,12 @@ export function StoreList({ stores, onSelect, onJudge }: Props) {
                 </span>
               )}
             </div>
-            <div className="text-sm text-muted-foreground">{s.address}</div>
+            <div className="text-sm text-muted-foreground">
+              {s.address}
+              {typeof s.distanceMeters === 'number' && (
+                <span className="ml-2 tabular-nums">· {Math.round(s.distanceMeters)}m</span>
+              )}
+            </div>
           </div>
           <div className="flex gap-2">
             <Button size="sm" variant="secondary" onClick={() => onSelect?.(s)}>
@@ -48,4 +53,3 @@ export function StoreList({ stores, onSelect, onJudge }: Props) {
 }
 
 export default StoreList;
-

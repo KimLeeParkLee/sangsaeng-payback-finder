@@ -7,3 +7,7 @@ export type MapMarker = {
   recognized?: boolean; // 인정 여부에 따라 마커 스타일 변경
 };
 
+export type MapBounds = {
+  sw: LatLng; // south-west
+  ne: LatLng; // north-east
+};
