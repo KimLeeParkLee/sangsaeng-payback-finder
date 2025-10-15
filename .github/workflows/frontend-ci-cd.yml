@@ -38,6 +38,8 @@ jobs:
         run: echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
 
       - name: Build and Push Frontend Image
+        env:
+          BUILDKIT_PROGRESS: plain
         uses: docker/build-push-action@v6
         with:
           context: .
