@@ -28,9 +28,13 @@ export default function ApiCheckButton() {
         const text = await res.text()
         setBody(text.slice(0, 2000))
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       setStatus('REQUEST_FAILED')
-      setBody(err?.message || String(err))
+      if (err instanceof Error) {
+        setBody(err.message)
+      } else {
+        setBody(String(err))
+      }
     } finally {
       setLoading(false)
     }
@@ -57,4 +61,3 @@ export default function ApiCheckButton() {
     </div>
   )
 }
-
