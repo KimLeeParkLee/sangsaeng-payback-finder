@@ -1,4 +1,4 @@
-# Global Docker ignore for root build context (frontend image)
+## Global Docker ignore for root build context (Next.js frontend)
 
 # VCS / CI / OS noise
 .git
@@ -7,17 +7,20 @@
 .gitattributes
 .DS_Store
 
-# Editor/IDE
+# Editors/IDE
 .idea
 .vscode
 *.iml
 
-# Node-related (frontend project)
+# Next.js project
 my-app/node_modules
+my-app/.next
+my-app/.turbo
+my-app/.vercel
 my-app/coverage
-my-app/.vite
 
 # Build artifacts
+my-app/out
 my-app/dist
 
 # Logs
@@ -33,6 +36,8 @@ npm-debug.log*
 *.p12
 *.jks
 
-# Keep nginx/ for Dockerfile.frontend COPY
+# Keep nginx/ for Dockerfile / deploy
 # Keep my-app/package-lock.json for reproducible npm ci
 
+# Local env files for Next.js app
+my-app/.env*

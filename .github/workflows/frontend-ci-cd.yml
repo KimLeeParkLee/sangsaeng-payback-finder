@@ -32,7 +32,7 @@ jobs:
         run: |
           OWNER_LC=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           echo "owner_lc=$OWNER_LC" >> "$GITHUB_OUTPUT"
-          echo "image=ghcr.io/$OWNER_LC/paybackfinder-frontend" >> "$GITHUB_OUTPUT"
+          echo "image=ghcr.io/$OWNER_LC/gitlog-frontend" >> "$GITHUB_OUTPUT"
 
       - name: Login to GHCR
         run: echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
@@ -46,8 +46,8 @@ jobs:
           file: ./Dockerfile.frontend
           push: true
           build-args: |
-            VITE_API_URL=/api
-            VITE_KAKAO_MAP_APP_KEY=${{ secrets.KAKAO_MAP_APP_KEY }}
+            NEXT_PUBLIC_API_URL=/api
+            NEXT_PUBLIC_KAKAO_MAP_APP_KEY=${{ secrets.KAKAO_MAP_APP_KEY }}
           tags: |
             ${{ steps.prep.outputs.image }}:latest
             ${{ steps.prep.outputs.image }}:${{ env.TAG }}
